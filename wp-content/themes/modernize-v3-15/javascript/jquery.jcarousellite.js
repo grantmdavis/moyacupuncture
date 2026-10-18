@@ -378,7 +378,19 @@ jQuery(window).load(function() {
 	carousellite.each(function(){
 		var fetch_num = jQuery(this).find('ul').children().length;
 		jQuery(this).parent(".columns, .column").css('overflow', 'hidden');
-		jQuery(this).jCarouselLite({ btnNext: ".next", btnPrev: ".prev", visible: fetch_num });
+		var carousel = jQuery(this);
+		// Size the box to the testimonial on screen instead of the tallest one
+		var fit_height = function(){
+			var view_left = carousel.parent()[0].getBoundingClientRect().left, current = null, best = Infinity;
+			carousel.find('ul > li').each(function(){
+				var d = Math.abs(this.getBoundingClientRect().left - view_left);
+				if( d < best ){ best = d; current = this; }
+			});
+			if( current ) carousel.stop().animate({ height: jQuery(current).outerHeight(true) }, 200);
+		};
+		carousel.jCarouselLite({ btnNext: ".next", btnPrev: ".prev", visible: fetch_num, afterEnd: fit_height });
+		fit_height();
+		jQuery(window).resize(function(){ setTimeout(fit_height, 50); });
 		//jQuery(this).jCarouselLite({ btnNext: ".next", btnPrev: ".prev", visible: fetch_num, auto: 4000, easing: "easeOutExpo", speed: 300 });
 	});
 	
